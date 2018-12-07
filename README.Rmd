@@ -1,0 +1,58 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# citymodes
+
+The goal of citymodes is to show how to represent how mode split varies with distance and other variables across different settlements.
+
+## Univariate
+
+```{r}
+d = seq(0.2, 20, by = 0.2)
+a = -3.894
+b1 = -0.5872
+b2 = 1.832
+b3 = 0.007956
+logit_pcycle = a + (b1 * d) + (b2 * sqrt(d) ) + (b3 * d^2)
+scen_baseline = boot::inv.logit(logit_pcycle) 
+scen_dutch = boot::inv.logit(logit_pcycle + 2.499 -0.07384 * d)
+txtplot::txtplot(d, scen_baseline, ylim = c(0, 1))
+txtplot::txtplot(d, scen_dutch, ylim = c(0, 1))
+```
+
+## Multinomial data
+
+Generate fake data on 3 modes.
+
+```{r}
+w = a = b = rep(1, length(d))
+b = scen_dutch 
+a = 1 - b
+w[d < 2] = 1
+w[d >= 2] = 0
+a[d < 2] = 0
+b[d < 2] = 0
+txtplot::txtplot(d, w)
+txtplot::txtplot(d, b)
+txtplot::txtplot(d, a)
+```
+
+## Individual level data
+
+```{r}
+# m = d
+# for(i in seq_along(d)) {
+#   m[i] = sample(x = 1:3, size = length(d), replace = TRUE, prob = c(a))
+# }
+```
+
